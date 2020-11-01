@@ -1,0 +1,82 @@
+<html>
+<head>
+  <title>Sapience Space</title> 	
+  <style> body { margin: 0; } </style>
+  <script src="https://unpkg.com/3d-force-graph"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/assets/resources/sapience.svg"/>
+</head>
+
+ <body bgcolor="#000011">
+  <div id="3d-graph"></div>
+
+ <script>
+
+  	var data;
+  	let Graph;
+
+    var link = "https://viz.cash/api/indirect_21e8";
+
+  	axios.get(link, {
+  		headers: {'Access-Control-Allow-Origin': '*'}})
+  	.then((res) => {
+  		data = res.data;
+  		Graph = ForceGraph3D()
+	    	(document.getElementById('3d-graph'))
+	    	.graphData(data)
+	    	.nodeAutoColorBy('name')
+	    	//.nodeLabel(node => `tx:${node.id}\n21e8:${node.name}`)
+	    	//.onNodeClick(node => {console.log(node.name);window.open(`https://whatsonchain.com/tx/${node.id}`)});
+  	}, (error) => {
+  		console.log(error);
+  	})
+  	
+
+    function searchHash(node) {
+    	if (node.key == 'Enter') {
+    		let txt = document.getElementById('hashInput').value;
+    		for (let i=0;i<data.nodes.length;i++) {
+    			if (txt == data.nodes[i].name.substring(0, txt.length)) {
+    				data.nodes[i].val = 500;
+    			}
+    		}
+    		Graph.graphData(data);
+    	}
+    }
+
+    function resetSize() {
+		for (let i=0;i<data.nodes.length;i++) {
+			   data.nodes[i].val = 1;
+    	}
+    	Graph.graphData(data);
+    }
+
+  	function changeDataNormal() {
+  		Graph.graphData(data);
+  	}
+
+  	function changeDataTw() {
+  		links = data.links;
+  		nodes = [];
+  		for (let i=0;i<data.nodes.length;i++) {
+  			if (data.nodes[i].is_tw) {
+  				nodes.push(data.nodes[i])
+  			}
+  		}
+  		Graph.graphData({'links': links, 'nodes': nodes});
+  	}
+
+  	function changeDataNotTw() {
+  		links = data.links;
+  		nodes = [];
+  		for (let i=0;i<data.nodes.length;i++) {
+  			if (!data.nodes[i].is_tw) {
+  				nodes.push(data.nodes[i])
+  			}
+  		}
+  		Graph.graphData({'links': links, 'nodes': nodes});
+  	}
+
+  </script>
+</body>
+</html>
